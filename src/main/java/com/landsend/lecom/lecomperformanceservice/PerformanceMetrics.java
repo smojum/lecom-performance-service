@@ -1,5 +1,6 @@
 package com.landsend.lecom.lecomperformanceservice;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,6 +24,7 @@ public class PerformanceMetrics {
     private String firstContentfulPaint;
     private String interactive;
     private String speedIndex;
+    @JsonFormat(timezone = "CST")
     private LocalDateTime runTime;
 
 }
