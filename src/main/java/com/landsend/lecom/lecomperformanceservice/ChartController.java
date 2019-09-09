@@ -21,9 +21,7 @@ public class ChartController {
         if(baseUrl == null) {
             model.addAttribute("data", null);
         } else {
-            log.info("Getting data for url: " + baseUrl);
             List<PerformanceMetrics> result = repository.findByUrlContaining(baseUrl);
-            log.info("Result: " + result);
             model.addAttribute("data", result);
         }
         model.addAttribute("baseUrl", baseUrl);
