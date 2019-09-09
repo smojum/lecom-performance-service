@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>LE Com Performance Metrics</title>
+    <link rel="stylesheet" th:href="@{webjars/bootstrap/css/bootstrap.min.css}"/>
+</head>
+<body>
+    <div class="starter-template">
+        <h1>LE Com Performance Metrics</h1>
+    </div>
+    <table class="columns">
+        <tr>
+            <td><div id="fcp_chart_pdp" style="width: 900px; height: 500px"></div></td>
+            <td><div id="fcp_chart_plp" style="width: 900px; height: 500px"></div></td>
+            <td><div id="fcp_chart_oth" style="width: 900px; height: 500px"></div></td>
+        </tr>
+        <tr>
+            <td><div id="int_chart_pdp" style="width: 900px; height: 500px"></div></td>
+            <td><div id="int_chart_plp" style="width: 900px; height: 500px"></div></td>
+            <td><div id="int_chart_oth" style="width: 900px; height: 500px"></div></td>
+        </tr>
+        <tr>
+            <td><div id="si_chart_pdp" style="width: 900px; height: 500px"></div></td>
+            <td><div id="si_chart_plp" style="width: 900px; height: 500px"></div></td>
+            <td><div id="si_chart_oth" style="width: 900px; height: 500px"></div></td>
+        </tr>
+    </table>
+
+<script type="text/javascript" th:src="@{webjars/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.load("visualization", "1", { packages: ["treemap"] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var rawData = /*[[${data}]]*/;
+
+        var fcp_data_plp = new google.visualization.DataTable()
+        fcp_data_plp.addColumn('date', 'Run Time')
+        fcp_data_plp.addColumn('number', 'PLP')
+
+        var fcp_data_pdp = new google.visualization.DataTable()
+        fcp_data_pdp.addColumn('date', 'Run Time')
+        fcp_data_pdp.addColumn('number', 'PDP')
+
+        var fcp_data_oth = new google.visualization.DataTable()
+        fcp_data_oth.addColumn('date', 'Run Time')
+        fcp_data_oth.addColumn('number', 'Search')
+
+        var int_data_plp = new google.visualization.DataTable()
+        int_data_plp.addColumn('date', 'Run Time')
+        int_data_plp.addColumn('number', 'PLP')
+
+        var int_data_pdp = new google.visualization.DataTable()
+        int_data_pdp.addColumn('date', 'Run Time')
+        int_data_pdp.addColumn('number', 'PDP')
+
+        var int_data_oth = new google.visualization.DataTable()
+        int_data_oth.addColumn('date', 'Run Time')
+        int_data_oth.addColumn('number', 'Search')
+
+        var si_data_plp = new google.visualization.DataTable()
+        si_data_plp.addColumn('date', 'Run Time')
+        si_data_plp.addColumn('number', 'PLP')
+
+        var si_data_pdp = new google.visualization.DataTable()
+        si_data_pdp.addColumn('date', 'Run Time')
+        si_data_pdp.addColumn('number', 'PDP')
+
+        var si_data_oth = new google.visualization.DataTable()
+        si_data_oth.addColumn('date', 'Run Time')
+        si_data_oth.addColumn('number', 'Search')
+        for (var i = 0; i < rawData.length; i++) {
+            if(rawData[i].urlType == 'PLP') {
+                fcp_data_plp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].firstContentfulPaint)]);
+                int_data_plp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].interactive)]);
+                si_data_plp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].speedIndex)]);
+            } else if(rawData[i].urlType == 'PDP') {
+                fcp_data_pdp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].firstContentfulPaint)]);
+                int_data_pdp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].interactive)]);
+                si_data_pdp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].speedIndex)]);
+            } else if(rawData[i].urlType == 'Search' ) {
+                fcp_data_oth.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].firstContentfulPaint)]);
+                int_data_oth.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].interactive)]);
+                si_data_oth.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].speedIndex)]);
+            }
+        }
+        console.log(fcp_data_pdp)
+
+        var fcp_options = {
+            title: 'First Contentful Paint',
+            curveType: 'function',
+            vAxis: { viewWindow: {min: 0, max: 12000}}
+        };
+        var int_options = {
+            title: 'Interactive',
+            curveType: 'function',
+            vAxis: { viewWindow: {min: 0, max: 40000}}
+        };
+        var si_options = {
+            title: 'Speed Index',
+            curveType: 'function',
+            vAxis: { viewWindow: {min: 0, max: 25000}}
+        };
+
+        var fcp_chart_plp = new google.visualization.LineChart(document.getElementById('fcp_chart_plp'));
+        var fcp_chart_pdp = new google.visualization.LineChart(document.getElementById('fcp_chart_pdp'));
+        var fcp_chart_oth = new google.visualization.LineChart(document.getElementById('fcp_chart_oth'));
+
+        var int_chart_plp = new google.visualization.LineChart(document.getElementById('int_chart_plp'));
+        var int_chart_pdp = new google.visualization.LineChart(document.getElementById('int_chart_pdp'));
+        var int_chart_oth = new google.visualization.LineChart(document.getElementById('int_chart_oth'));
+
+        var si_chart_plp = new google.visualization.LineChart(document.getElementById('si_chart_plp'));
+        var si_chart_pdp = new google.visualization.LineChart(document.getElementById('si_chart_pdp'));
+        var si_chart_oth = new google.visualization.LineChart(document.getElementById('si_chart_oth'));
+        fcp_chart_plp.draw(fcp_data_plp, fcp_options);
+        fcp_chart_pdp.draw(fcp_data_pdp, fcp_options);
+        fcp_chart_oth.draw(fcp_data_oth, fcp_options);
+        int_chart_plp.draw(int_data_plp, int_options);
+        int_chart_pdp.draw(int_data_pdp, int_options);
+        int_chart_oth.draw(int_data_oth, int_options);
+        si_chart_plp.draw(si_data_plp, si_options);
+        si_chart_pdp.draw(si_data_pdp, si_options);
+        si_chart_oth.draw(si_data_oth, si_options);
+    }
+</script>
+</body>
+</html>
