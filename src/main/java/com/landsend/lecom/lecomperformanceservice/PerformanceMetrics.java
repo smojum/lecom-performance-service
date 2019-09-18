@@ -26,5 +26,6 @@ public class PerformanceMetrics {
     private String speedIndex;
     @JsonFormat(timezone = "CST")
     private LocalDateTime runTime;
+    private String html;
 
 }
