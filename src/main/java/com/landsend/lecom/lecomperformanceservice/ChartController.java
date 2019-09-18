@@ -69,7 +69,7 @@ public class ChartController {
     private String[] getUrls() {
         String[] urls = new String[3];
         urls[0] = "";
-        urls[1] = "le-tst-2.landsend.com";
+        urls[1] = "le-dev-b.landsend.com";
         urls[2] = "le-int-c.landsend.com";
         return urls;
     }
