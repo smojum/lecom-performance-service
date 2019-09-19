@@ -103,22 +103,34 @@
         var si_data_oth = new google.visualization.DataTable();
         si_data_oth.addColumn('date', 'Run Time');
         si_data_oth.addColumn('number', 'Search');
-        var fcp_data_plp_counter = 0
+        var plp_counter = 0
+        var pdp_counter = 0
+        var oth_counter = 0
         for (var i = 0; i < rawData.length; i++) {
             if (rawData[i].urlType == 'PLP') {
                 fcp_data_plp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].firstContentfulPaint)]);
-                fcp_data_plp.setProperty(fcp_data_plp_counter, 1, "id", rawData[i].id);
-                fcp_data_plp_counter++;
+                fcp_data_plp.setProperty(plp_counter, 1, "id", rawData[i].id);
                 int_data_plp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].interactive)]);
+                int_data_plp.setProperty(plp_counter, 1, "id", rawData[i].id);
                 si_data_plp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].speedIndex)]);
+                si_data_plp.setProperty(plp_counter, 1, "id", rawData[i].id);
+                plp_counter++;
             } else if (rawData[i].urlType == 'PDP') {
                 fcp_data_pdp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].firstContentfulPaint)]);
+                fcp_data_pdp.setProperty(pdp_counter, 1, "id", rawData[i].id);
                 int_data_pdp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].interactive)]);
+                int_data_pdp.setProperty(pdp_counter, 1, "id", rawData[i].id);
                 si_data_pdp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].speedIndex)]);
+                si_data_pdp.setProperty(pdp_counter, 1, "id", rawData[i].id);
+                pdp_counter++;
             } else if (rawData[i].urlType == 'Search') {
                 fcp_data_oth.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].firstContentfulPaint)]);
+                fcp_data_oth.setProperty(oth_counter, 1, "id", rawData[i].id);
                 int_data_oth.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].interactive)]);
+                int_data_oth.setProperty(oth_counter, 1, "id", rawData[i].id);
                 si_data_oth.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].speedIndex)]);
+                si_data_oth.setProperty(oth_counter, 1, "id", rawData[i].id);
+                oth_counter++;
             }
         }
         console.log(fcp_data_pdp);
@@ -155,7 +167,7 @@
         var si_chart_oth = new google.visualization.LineChart(document.getElementById('si_chart_oth'));
 
         fcp_chart_plp.setAction({
-            id: 'sample',
+            id: 'fcp_chart_plp',
             text: 'See Lighthouse Detailed Report',
             action: function () {
                 var selectedItem = fcp_chart_plp.getSelection()[0];
@@ -166,13 +178,101 @@
             }
         });
         fcp_chart_plp.draw(fcp_data_plp, fcp_options);
+        fcp_chart_pdp.setAction({
+            id: 'fcp_chart_pdp',
+            text: 'See Lighthouse Detailed Report',
+            action: function () {
+                var selectedItem = fcp_chart_pdp.getSelection()[0];
+                if (selectedItem) {
+                    var value = fcp_data_pdp.getProperty(selectedItem.row, selectedItem.column, "id");
+                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
+                }
+            }
+        });
         fcp_chart_pdp.draw(fcp_data_pdp, fcp_options);
+        fcp_chart_oth.setAction({
+            id: 'fcp_chart_oth',
+            text: 'See Lighthouse Detailed Report',
+            action: function () {
+                var selectedItem = fcp_chart_oth.getSelection()[0];
+                if (selectedItem) {
+                    var value = fcp_data_oth.getProperty(selectedItem.row, selectedItem.column, "id");
+                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
+                }
+            }
+        });
         fcp_chart_oth.draw(fcp_data_oth, fcp_options);
+        int_chart_plp.setAction({
+            id: 'int_chart_plp',
+            text: 'See Lighthouse Detailed Report',
+            action: function () {
+                var selectedItem = int_chart_plp.getSelection()[0];
+                if (selectedItem) {
+                    var value = int_data_plp.getProperty(selectedItem.row, selectedItem.column, "id");
+                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
+                }
+            }
+        });
         int_chart_plp.draw(int_data_plp, int_options);
+        int_chart_pdp.setAction({
+            id: 'int_chart_pdp',
+            text: 'See Lighthouse Detailed Report',
+            action: function () {
+                var selectedItem = int_chart_pdp.getSelection()[0];
+                if (selectedItem) {
+                    var value = int_data_pdp.getProperty(selectedItem.row, selectedItem.column, "id");
+                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
+                }
+            }
+        });
         int_chart_pdp.draw(int_data_pdp, int_options);
+        int_chart_oth.setAction({
+            id: 'int_chart_oth',
+            text: 'See Lighthouse Detailed Report',
+            action: function () {
+                var selectedItem = int_chart_oth.getSelection()[0];
+                if (selectedItem) {
+                    var value = int_data_oth.getProperty(selectedItem.row, selectedItem.column, "id");
+                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
+                }
+            }
+        });
         int_chart_oth.draw(int_data_oth, int_options);
+        si_chart_plp.setAction({
+            id: 'si_chart_plp',
+            text: 'See Lighthouse Detailed Report',
+            action: function () {
+                var selectedItem = si_chart_plp.getSelection()[0];
+                if (selectedItem) {
+                    var value = si_chart_plp.getProperty(selectedItem.row, selectedItem.column, "id");
+                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
+                }
+            }
+        });
         si_chart_plp.draw(si_data_plp, si_options);
+        si_chart_pdp.setAction({
+            id: 'si_chart_pdp',
+            text: 'See Lighthouse Detailed Report',
+            action: function () {
+                var selectedItem = si_chart_pdp.getSelection()[0];
+                if (selectedItem) {
+                    var value = si_data_pdp.getProperty(selectedItem.row, selectedItem.column, "id");
+                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
+                }
+            }
+        });
         si_chart_pdp.draw(si_data_pdp, si_options);
+        si_chart_oth.setAction({
+            id: 'si_chart_oth',
+            text: 'See Lighthouse Detailed Report',
+            action: function () {
+                var selectedItem = si_chart_oth.getSelection()[0];
+                if (selectedItem) {
+                    var value = si_data_oth.getProperty(selectedItem.row, selectedItem.column, "id");
+                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
+                }
+            }
+        });
         si_chart_oth.draw(si_data_oth, si_options);
     }
 
