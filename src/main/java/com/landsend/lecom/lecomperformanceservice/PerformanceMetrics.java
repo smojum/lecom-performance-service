@@ -21,9 +21,9 @@ public class PerformanceMetrics {
     private String url;
     private String baseUrl;
     private String urlType;
-    private String firstContentfulPaint;
-    private String interactive;
-    private String speedIndex;
+    private Integer firstContentfulPaint;
+    private Integer interactive;
+    private Integer speedIndex;
     @JsonFormat(timezone = "CST")
     private LocalDateTime runTime;
     private String html;
