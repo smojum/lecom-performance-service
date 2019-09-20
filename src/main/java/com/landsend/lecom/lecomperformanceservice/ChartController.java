@@ -34,6 +34,8 @@ public class ChartController {
             model.addAttribute("data", null);
         } else {
             List<PerformanceMetrics> result = repository.findByUrlContaining(baseUrl);
+            result.stream()
+                    .forEach(performanceMetrics -> performanceMetrics.setHtml(null));
             model.addAttribute("data", result);
         }
         model.addAttribute("baseUrl", baseUrl);
@@ -59,10 +61,16 @@ public class ChartController {
     @GetMapping("/chart-all")
     public String chartall(Model model) {
         List<PerformanceMetrics> result = repository.findAll();
+        result.stream()
+                .forEach(performanceMetrics -> performanceMetrics.setHtml(null));
         Map<String, List<PerformanceMetrics>> resultGroupByBaseUrl = result
                 .stream()
                 .collect(Collectors.groupingBy(PerformanceMetrics::getBaseUrl));
         model.addAttribute("data", resultGroupByBaseUrl);
+        String constData = "{\"le-int-b.landsend.com\": [[\"2019-09-19T16:44:18.473\", 156.0], [\"2019-09-19T16:53:18.473\", 69.0], [\"2019-09-19T16:58:18.473\", 126.0]], \"le-int-c.landsend.com\": [[\"2019-09-19T16:45:18.473\", 174.0], [\"2019-09-19T16:54:18.473\", 154.0], [\"2019-09-19T16:59:18.473\", 180.0]]}";
+        model.addAttribute("constData", constData);
+        model.addAttribute("urls", getUrls());
+
         return "chart-all";
     }
 
