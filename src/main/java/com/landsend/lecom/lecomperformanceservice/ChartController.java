@@ -15,9 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller()
@@ -38,6 +36,7 @@ public class ChartController {
                     .forEach(performanceMetrics -> performanceMetrics.setHtml(null));
             model.addAttribute("data", result);
         }
+        model.addAttribute("constData", getChartData());
         model.addAttribute("baseUrl", baseUrl);
         return "chart";
     }
@@ -67,13 +66,46 @@ public class ChartController {
                 .stream()
                 .collect(Collectors.groupingBy(PerformanceMetrics::getBaseUrl));
         model.addAttribute("data", resultGroupByBaseUrl);
-        String constData = "{\"le-int-b.landsend.com\": [[\"2019-09-19T16:44:18.473\", 156.0], [\"2019-09-19T16:53:18.473\", 69.0], [\"2019-09-19T16:58:18.473\", 126.0]], \"le-int-c.landsend.com\": [[\"2019-09-19T16:45:18.473\", 174.0], [\"2019-09-19T16:54:18.473\", 154.0], [\"2019-09-19T16:59:18.473\", 180.0]]}";
-        model.addAttribute("constData", constData);
+        model.addAttribute("constData", getChartData());
         model.addAttribute("urls", getUrls());
 
         return "chart-all";
     }
 
+    private Map<String, List<List<String>>> getChartData() {
+        List<String> datapoint1_1 = new ArrayList<>();
+        datapoint1_1.add("2019-09-19T16:44:18.473");
+        datapoint1_1.add("156");
+        List<String> datapoint1_2 = new ArrayList<>();
+        datapoint1_2.add("2019-09-19T16:54:18.473");
+        datapoint1_2.add("166");
+        List<String> datapoint1_3 = new ArrayList<>();
+        datapoint1_3.add("2019-09-19T17:04:18.473");
+        datapoint1_3.add("176");
+        List<List<String>> datapoint_1 = new ArrayList<>();
+        datapoint_1.add(datapoint1_1);
+        datapoint_1.add(datapoint1_2);
+        datapoint_1.add(datapoint1_3);
+        List<String> datapoint2_1 = new ArrayList<>();
+        datapoint2_1.add("2019-09-19T16:45:18.473");
+        datapoint2_1.add("159");
+        List<String> datapoint2_2 = new ArrayList<>();
+        datapoint2_2.add("2019-09-19T16:55:18.473");
+        datapoint2_2.add("169");
+        List<String> datapoint2_3 = new ArrayList<>();
+        datapoint2_3.add("2019-09-19T17:05:18.473");
+        datapoint2_3.add("179");
+        List<List<String>> datapoint_2 = new ArrayList<>();
+        datapoint_2.add(datapoint2_1);
+        datapoint_2.add(datapoint2_2);
+        datapoint_2.add(datapoint2_3);
+
+        Map<String, List<List<String>>> group = new HashMap<>();
+
+        group.put("le-int-b.landsend.com", datapoint_1);
+        group.put("le-int-c.landsend.com", datapoint_2);
+        return group;
+    }
     private String[] getUrls() {
         String[] urls = new String[3];
         urls[0] = "";

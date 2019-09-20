@@ -10,63 +10,17 @@
 <div class="starter-template">
     <h1>LE Com Performance Metrics</h1>
 </div>
-<form>
-    <div><span th:if="${baseUrl != null}" th:text="'Selected environment: ' + ${baseUrl}"></span>
-    </div>
-    <div>
-        <select th:name="baseUrl" onchange="this.form.submit()" th:selected="${baseUrl}">
-            <option th:each="url : ${urls}"
-                    th:value="${url}"
-                    th:text="${url}"/>
-        </select>
-    </div>
-</form>
 <div id="chart_div"></div>
-<table class="columns">
-    <tr>
-        <td>
-            <div id="fcp_chart_pdp" style="width: 900px; height: 500px"></div>
-        </td>
-        <td>
-            <div id="fcp_chart_plp" style="width: 900px; height: 500px"></div>
-        </td>
-        <td>
-            <div id="fcp_chart_oth" style="width: 900px; height: 500px"></div>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <div id="int_chart_pdp" style="width: 900px; height: 500px"></div>
-        </td>
-        <td>
-            <div id="int_chart_plp" style="width: 900px; height: 500px"></div>
-        </td>
-        <td>
-            <div id="int_chart_oth" style="width: 900px; height: 500px"></div>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <div id="si_chart_pdp" style="width: 900px; height: 500px"></div>
-        </td>
-        <td>
-            <div id="si_chart_plp" style="width: 900px; height: 500px"></div>
-        </td>
-        <td>
-            <div id="si_chart_oth" style="width: 900px; height: 500px"></div>
-        </td>
-    </tr>
-</table>
 
-<script type="text/javascript" th:src="@{webjars/bootstrap/js/bootstrap.min.js}"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript" th:inline="javascript">
     google.charts.load('current', {'packages': ['corechart']});
     google.load("visualization", "1", {packages: ["treemap"]});
+    console.log("starting")
     google.charts.setOnLoadCallback(drawChart);
-
     function drawChart() {
+        console.log(/*[[${constData}]]*/);
         var google_chart_json = /*[[${constData}]]*/;
         var datas = [];
         $.each(google_chart_json, function (key, val) {
@@ -77,20 +31,20 @@
 
 
             $.each(val, function (_, scan) {
-                var date = scan[0];
+                var timestamp = scan[0];
                 var price = scan[1];
 
                 data.addRows([
-                    [new Date(date), price]
+                    [new Date(timestamp), price]
                 ]);
             });
             datas.push(data);
         });
         var joinedData = datas[0];
         $.each(datas, function (index, datatable) {
-            console.log('joining index '+index)
+            console.log('joining index ' + index);
             if (index != 0) {
-                joinedData = google.visualization.data.join(joinedData, datatable, 'full', [ [0, 0]         ], [1], [1]);
+                joinedData = google.visualization.data.join(joinedData, datatable, 'full', [[0, 0]], [1], [1]);
             }
         });
 
@@ -105,218 +59,6 @@
                 keepInBounds: true
             },
         });
-    }
-
-    function drawChart1() {
-        console.log(JSON.stringify(/*[[${data}]]*/));
-        var rawData = /*[[${data}]]*/;
-
-        var fcp_data_plp = new google.visualization.DataTable();
-        fcp_data_plp.addColumn('date', 'Run Time');
-        fcp_data_plp.addColumn('number', 'PLP');
-
-        var fcp_data_pdp = new google.visualization.DataTable();
-        fcp_data_pdp.addColumn('date', 'Run Time');
-        fcp_data_pdp.addColumn('number', 'PDP');
-
-        var fcp_data_oth = new google.visualization.DataTable();
-        fcp_data_oth.addColumn('date', 'Run Time');
-        fcp_data_oth.addColumn('number', 'Search');
-
-        var int_data_plp = new google.visualization.DataTable();
-        int_data_plp.addColumn('date', 'Run Time');
-        int_data_plp.addColumn('number', 'PLP');
-
-        var int_data_pdp = new google.visualization.DataTable();
-        int_data_pdp.addColumn('date', 'Run Time');
-        int_data_pdp.addColumn('number', 'PDP');
-
-        var int_data_oth = new google.visualization.DataTable();
-        int_data_oth.addColumn('date', 'Run Time');
-        int_data_oth.addColumn('number', 'Search');
-
-        var si_data_plp = new google.visualization.DataTable();
-        si_data_plp.addColumn('date', 'Run Time');
-        si_data_plp.addColumn('number', 'PLP');
-
-        var si_data_pdp = new google.visualization.DataTable();
-        si_data_pdp.addColumn('date', 'Run Time');
-        si_data_pdp.addColumn('number', 'PDP');
-
-        var si_data_oth = new google.visualization.DataTable();
-        si_data_oth.addColumn('date', 'Run Time');
-        si_data_oth.addColumn('number', 'Search');
-        var plp_counter = 0
-        var pdp_counter = 0
-        var oth_counter = 0
-        for (var i = 0; i < rawData.length; i++) {
-            if (rawData[i].urlType == 'PLP') {
-                fcp_data_plp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].firstContentfulPaint)]);
-                fcp_data_plp.setProperty(plp_counter, 1, "id", rawData[i].id);
-                int_data_plp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].interactive)]);
-                int_data_plp.setProperty(plp_counter, 1, "id", rawData[i].id);
-                si_data_plp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].speedIndex)]);
-                si_data_plp.setProperty(plp_counter, 1, "id", rawData[i].id);
-                plp_counter++;
-            } else if (rawData[i].urlType == 'PDP') {
-                fcp_data_pdp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].firstContentfulPaint)]);
-                fcp_data_pdp.setProperty(pdp_counter, 1, "id", rawData[i].id);
-                int_data_pdp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].interactive)]);
-                int_data_pdp.setProperty(pdp_counter, 1, "id", rawData[i].id);
-                si_data_pdp.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].speedIndex)]);
-                si_data_pdp.setProperty(pdp_counter, 1, "id", rawData[i].id);
-                pdp_counter++;
-            } else if (rawData[i].urlType == 'Search') {
-                fcp_data_oth.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].firstContentfulPaint)]);
-                fcp_data_oth.setProperty(oth_counter, 1, "id", rawData[i].id);
-                int_data_oth.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].interactive)]);
-                int_data_oth.setProperty(oth_counter, 1, "id", rawData[i].id);
-                si_data_oth.addRow([new Date(rawData[i].runTime), parseInt(rawData[i].speedIndex)]);
-                si_data_oth.setProperty(oth_counter, 1, "id", rawData[i].id);
-                oth_counter++;
-            }
-        }
-        console.log(fcp_data_pdp);
-
-        var fcp_options = {
-            tooltip: {trigger: 'selection'},
-            title: 'First Contentful Paint',
-            curveType: 'function',
-            vAxis: {viewWindow: {min: 0, max: 12000}}
-        };
-        var int_options = {
-            tooltip: {trigger: 'selection'},
-            title: 'Interactive',
-            curveType: 'function',
-            vAxis: {viewWindow: {min: 0, max: 40000}}
-        };
-        var si_options = {
-            tooltip: {trigger: 'selection'},
-            title: 'Speed Index',
-            curveType: 'function',
-            vAxis: {viewWindow: {min: 0, max: 25000}}
-        };
-
-        var fcp_chart_plp = new google.visualization.LineChart(document.getElementById('fcp_chart_plp'));
-        var fcp_chart_pdp = new google.visualization.LineChart(document.getElementById('fcp_chart_pdp'));
-        var fcp_chart_oth = new google.visualization.LineChart(document.getElementById('fcp_chart_oth'));
-
-        var int_chart_plp = new google.visualization.LineChart(document.getElementById('int_chart_plp'));
-        var int_chart_pdp = new google.visualization.LineChart(document.getElementById('int_chart_pdp'));
-        var int_chart_oth = new google.visualization.LineChart(document.getElementById('int_chart_oth'));
-
-        var si_chart_plp = new google.visualization.LineChart(document.getElementById('si_chart_plp'));
-        var si_chart_pdp = new google.visualization.LineChart(document.getElementById('si_chart_pdp'));
-        var si_chart_oth = new google.visualization.LineChart(document.getElementById('si_chart_oth'));
-
-        fcp_chart_plp.setAction({
-            id: 'fcp_chart_plp',
-            text: 'See Lighthouse Detailed Report',
-            action: function () {
-                var selectedItem = fcp_chart_plp.getSelection()[0];
-                if (selectedItem) {
-                    var value = fcp_data_plp.getProperty(selectedItem.row, selectedItem.column, "id");
-                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
-                }
-            }
-        });
-        fcp_chart_plp.draw(fcp_data_plp, fcp_options);
-        fcp_chart_pdp.setAction({
-            id: 'fcp_chart_pdp',
-            text: 'See Lighthouse Detailed Report',
-            action: function () {
-                var selectedItem = fcp_chart_pdp.getSelection()[0];
-                if (selectedItem) {
-                    var value = fcp_data_pdp.getProperty(selectedItem.row, selectedItem.column, "id");
-                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
-                }
-            }
-        });
-        fcp_chart_pdp.draw(fcp_data_pdp, fcp_options);
-        fcp_chart_oth.setAction({
-            id: 'fcp_chart_oth',
-            text: 'See Lighthouse Detailed Report',
-            action: function () {
-                var selectedItem = fcp_chart_oth.getSelection()[0];
-                if (selectedItem) {
-                    var value = fcp_data_oth.getProperty(selectedItem.row, selectedItem.column, "id");
-                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
-                }
-            }
-        });
-        fcp_chart_oth.draw(fcp_data_oth, fcp_options);
-        int_chart_plp.setAction({
-            id: 'int_chart_plp',
-            text: 'See Lighthouse Detailed Report',
-            action: function () {
-                var selectedItem = int_chart_plp.getSelection()[0];
-                if (selectedItem) {
-                    var value = int_data_plp.getProperty(selectedItem.row, selectedItem.column, "id");
-                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
-                }
-            }
-        });
-        int_chart_plp.draw(int_data_plp, int_options);
-        int_chart_pdp.setAction({
-            id: 'int_chart_pdp',
-            text: 'See Lighthouse Detailed Report',
-            action: function () {
-                var selectedItem = int_chart_pdp.getSelection()[0];
-                if (selectedItem) {
-                    var value = int_data_pdp.getProperty(selectedItem.row, selectedItem.column, "id");
-                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
-                }
-            }
-        });
-        int_chart_pdp.draw(int_data_pdp, int_options);
-        int_chart_oth.setAction({
-            id: 'int_chart_oth',
-            text: 'See Lighthouse Detailed Report',
-            action: function () {
-                var selectedItem = int_chart_oth.getSelection()[0];
-                if (selectedItem) {
-                    var value = int_data_oth.getProperty(selectedItem.row, selectedItem.column, "id");
-                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
-                }
-            }
-        });
-        int_chart_oth.draw(int_data_oth, int_options);
-        si_chart_plp.setAction({
-            id: 'si_chart_plp',
-            text: 'See Lighthouse Detailed Report',
-            action: function () {
-                var selectedItem = si_chart_plp.getSelection()[0];
-                if (selectedItem) {
-                    var value = si_chart_plp.getProperty(selectedItem.row, selectedItem.column, "id");
-                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
-                }
-            }
-        });
-        si_chart_plp.draw(si_data_plp, si_options);
-        si_chart_pdp.setAction({
-            id: 'si_chart_pdp',
-            text: 'See Lighthouse Detailed Report',
-            action: function () {
-                var selectedItem = si_chart_pdp.getSelection()[0];
-                if (selectedItem) {
-                    var value = si_data_pdp.getProperty(selectedItem.row, selectedItem.column, "id");
-                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
-                }
-            }
-        });
-        si_chart_pdp.draw(si_data_pdp, si_options);
-        si_chart_oth.setAction({
-            id: 'si_chart_oth',
-            text: 'See Lighthouse Detailed Report',
-            action: function () {
-                var selectedItem = si_chart_oth.getSelection()[0];
-                if (selectedItem) {
-                    var value = si_data_oth.getProperty(selectedItem.row, selectedItem.column, "id");
-                    window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
-                }
-            }
-        });
-        si_chart_oth.draw(si_data_oth, si_options);
     }
 
 </script>
