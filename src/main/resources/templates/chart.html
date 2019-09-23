@@ -35,13 +35,13 @@
     </tr>
     <tr>
         <td>
-            <div id="Other_FCP_chart" style="width: 600px; height: 400px"></div>
+            <div id="Search_FCP_chart" style="width: 600px; height: 400px"></div>
         </td>
         <td>
-            <div id="Other_Interactive_chart" style="width: 600px; height: 400px"></div>
+            <div id="Search_Interactive_chart" style="width: 600px; height: 400px"></div>
         </td>
         <td>
-            <div id="Other_SI_chart" style="width: 600px; height: 400px"></div>
+            <div id="Search_SI_chart" style="width: 600px; height: 400px"></div>
         </td>
     </tr>
 </table>
@@ -55,7 +55,7 @@
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
-        var allData = /*[[${constData}]]*/;
+        var allData = /*[[${chartData}]]*/;
         Object.keys(allData).forEach(function (allKey) {
             var typeData = allData[allKey];
             Object.keys(typeData).forEach(function (typeKey) {
