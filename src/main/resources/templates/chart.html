@@ -83,17 +83,19 @@
                     datas.push(data);
                 });
                 var joinedData;
+                var prevValue;
                 datas.forEach(function (value, index) {
                     console.log('joining index ' + index);
-                    var array = new Array(index+1);
-                    for(var i =0; i<index+1;i++) {
-                        array[i] = i + 1
+                    var array = new Array(index);
+                    for(var i =0; i<index;i++) {
+                        array[i] = i+1
                     }
                     console.log(array)
                     if(index == 0) {
-                        joinedData = google.visualization.data.join(datas[index], value, 'full', [ [ 0, 0 ] ], array, [1]);
+                        prevValue = value;
                     } else {
-                        joinedData = google.visualization.data.join(joinedData, value, 'full', [ [ 0, 0 ] ], array, [1]);
+                        joinedData = google.visualization.data.join(prevValue, value, 'full', [ [ 0, 0 ] ], array, [1]);
+                        prevValue = joinedData;
                     }
                 });
                 console.log(allKey+ '_' + typeKey + '_chart')
