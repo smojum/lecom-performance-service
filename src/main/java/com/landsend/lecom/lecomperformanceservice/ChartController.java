@@ -42,7 +42,7 @@ public class ChartController {
         List<PerformanceMetricsNormalized> performanceMetricsNormalizedList = new ArrayList<>();
         PerformanceMetricsNormalized base = new PerformanceMetricsNormalized();
         base.setId(performanceMetrics.getId());
-        base.setBaseUrl(performanceMetrics.getBaseUrl());
+        base.setBaseUrl(performanceMetrics.getBaseUrl().split("\\.")[0]);
         base.setRunTime(performanceMetrics.getRunTime());
         base.setUrlType(performanceMetrics.getUrlType());
         PerformanceMetricsNormalized fcp = (PerformanceMetricsNormalized) base.clone();
