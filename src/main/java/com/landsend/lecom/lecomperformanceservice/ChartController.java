@@ -25,10 +25,19 @@ public class ChartController {
     @GetMapping("/chart")
     public String chart(@RequestParam(value = "selectedDays", required = false, defaultValue = "3") Integer selectedDays,
                         @RequestParam(value = "selectedHours", required = false, defaultValue = "0") Integer selectedHours, Model model) {
+
+        model.addAttribute("domains", getDomains());
         model.addAttribute("selectedDays", selectedDays);
         model.addAttribute("selectedHours", selectedHours);
         model.addAttribute("chartData", getChartData(selectedDays, selectedHours));
         return "chart";
+    }
+
+    public List<Domain> getDomains() {
+        List<Domain> domains = new ArrayList<>();
+        domains.add(new Domain("www", "www", true));
+        domains.add(new Domain("le-dev-b", "le-dev-b", false));
+        return domains;
     }
 
     public Map<String, Map<String, Map<String, List<List<String>>>>> getChartData(Integer days, Integer hours) {
