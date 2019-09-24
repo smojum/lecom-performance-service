@@ -37,7 +37,6 @@ public class PerformanceMetricsController {
     public void addData(@RequestBody PerformanceMetrics performanceMetrics) {
         setBaseUrl(performanceMetrics);
         setUrlType(performanceMetrics);
-        log.info(performanceMetrics.toString());
         repository.save(performanceMetrics);
     }
 

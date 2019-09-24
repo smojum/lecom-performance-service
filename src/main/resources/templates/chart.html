@@ -60,17 +60,14 @@
             var typeData = allData[allKey];
             Object.keys(typeData).forEach(function (typeKey) {
                 var datas = [];
-                console.log('Key : ' + typeKey + ', Value : ' + typeData[typeKey]);
                 var chartData = typeData[typeKey];
                 Object.keys(chartData).forEach(function (key) {
-                    console.log('Key : ' + key);
                     var domain = key;
                     var data = new google.visualization.DataTable();
                     data.addColumn('date', 'RunTime');
                     data.addColumn('number', domain);
                     var value = chartData[key];
                     value.forEach(function (item, index) {
-                        console.log(item, index);
                         var timestamp = item[0];
                         var price = parseInt(item[1]);
                         var id = item[2];
@@ -79,18 +76,15 @@
                         ]);
                         data.setProperty(index, 1, "id", id)
                     });
-                    console.log(data);
                     datas.push(data);
                 });
                 var joinedData;
                 var prevValue;
                 datas.forEach(function (value, index) {
-                    console.log('joining index ' + index);
                     var array = new Array(index);
                     for(var i =0; i<index;i++) {
                         array[i] = i+1
                     }
-                    console.log(array)
                     if(index == 0) {
                         prevValue = value;
                     } else {
@@ -98,23 +92,18 @@
                         prevValue = joinedData;
                     }
                 });
-                console.log(allKey+ '_' + typeKey + '_chart')
                 var chart = new google.visualization.LineChart(document.getElementById(allKey+ '_' + typeKey + '_chart'));
                 chart.setAction({
                     id: allKey+ '_' + typeKey + '_chart',
                     text: 'See Lighthouse Detailed Report',
                     action: function () {
-                        console.log(chart.getSelection())
                         var selectedItem = chart.getSelection()[0];
-                        console.log(JSON.stringify(selectedItem))
                         if (selectedItem) {
                             var value = joinedData.getProperty(selectedItem.row, selectedItem.column, "id");
-                            console.log(value)
                             window.open('/report/' + value, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes')
                         }
                     }
                 });
-                console.log(joinedData)
                 chart.draw(joinedData, {
                     tooltip: {trigger: 'selection'},
                     title: allKey + ' ' + typeKey + ' chart',

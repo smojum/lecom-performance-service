@@ -34,7 +34,6 @@ public class ChartController {
                                         groupingBy(
                                                 performanceMetricsNormalized -> performanceMetricsNormalized.getBaseUrl(),
                                                 Collectors.mapping(PerformanceMetricsNormalized::getArray, Collectors.toList())))));
-        log.info("Output: " + output);
         return output;
     }
 
