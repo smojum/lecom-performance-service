@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -8,8 +8,16 @@
 </head>
 <body>
 <div class="starter-template">
-    <h1>LE Com Performance Metrics</h1>
+    <h1 align="center">LE Com Performance Metrics</h1>
 </div>
+<form method="get">
+    <div>
+        <span><label>Please choose number of days you plan to look back for charting: </label></span>
+        <span>
+            <input type="number" min="1" max="7" step="1" size="2" th:value="${selectedDays}" id="selectedDays" name="selectedDays"/>
+        </span>
+    </div>
+</form>
 <table class="columns">
     <tr>
         <td>
@@ -80,21 +88,22 @@
                 });
                 var joinedData;
                 var prevValue;
+
                 datas.forEach(function (value, index) {
                     var array = new Array(index);
-                    for(var i =0; i<index;i++) {
-                        array[i] = i+1
+                    for (var i = 0; i < index; i++) {
+                        array[i] = i + 1
                     }
-                    if(index == 0) {
+                    if (index == 0) {
                         prevValue = value;
                     } else {
                         joinedData = google.visualization.data.join(prevValue, value, 'full', [ [ 0, 0 ] ], array, [1]);
                         prevValue = joinedData;
                     }
                 });
-                var chart = new google.visualization.LineChart(document.getElementById(allKey+ '_' + typeKey + '_chart'));
+                var chart = new google.visualization.LineChart(document.getElementById(allKey + '_' + typeKey + '_chart'));
                 chart.setAction({
-                    id: allKey+ '_' + typeKey + '_chart',
+                    id: allKey + '_' + typeKey + '_chart',
                     text: 'See Lighthouse Detailed Report',
                     action: function () {
                         var selectedItem = chart.getSelection()[0];

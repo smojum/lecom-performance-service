@@ -14,7 +14,7 @@ public class LecomPerformanceServiceApplicationTests {
     ChartController chartController;
     @Test
     public void testController() {
-        chartController.getChartData();
+        chartController.getChartData(3);
     }
 
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -20,13 +21,17 @@ public class ChartController {
     private PerformanceMetricsRepository repository;
 
     @GetMapping("/chart")
-    public String chart(Model model) {
-        model.addAttribute("chartData", getChartData());
+    public String chart(@RequestParam(value = "selectedDays", required = false) Integer selectedDays, Model model) {
+        if(selectedDays == null) {
+            selectedDays = 3;
+        }
+        model.addAttribute("selectedDays", selectedDays);
+        model.addAttribute("chartData", getChartData(selectedDays));
         return "chart";
     }
 
-    public Map<String, Map<String, Map<String, List<List<String>>>>> getChartData() {
-        List<PerformanceMetrics> result = repository.findByRunTimeGreaterThan(LocalDateTime.now().minusDays(3));
+    public Map<String, Map<String, Map<String, List<List<String>>>>> getChartData(Integer days) {
+        List<PerformanceMetrics> result = repository.findByRunTimeGreaterThan(LocalDateTime.now().minusDays(days));
         Map<String, Map<String, Map<String, List<List<String>>>>> output = result.stream()
                 .flatMap(performanceMetrics -> normalizedList(performanceMetrics).stream())
                 .collect(
