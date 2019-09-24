@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ public class ChartController {
     }
 
     public Map<String, Map<String, Map<String, List<List<String>>>>> getChartData() {
-        List<PerformanceMetrics> result = repository.findAll();
+        List<PerformanceMetrics> result = repository.findByRunTimeGreaterThan(LocalDateTime.now().minusDays(3));
         Map<String, Map<String, Map<String, List<List<String>>>>> output = result.stream()
                 .flatMap(performanceMetrics -> normalizedList(performanceMetrics).stream())
                 .collect(
