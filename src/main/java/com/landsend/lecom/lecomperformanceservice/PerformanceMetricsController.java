@@ -56,7 +56,7 @@ public class PerformanceMetricsController {
             metrics.setUrlType("PLP");
         } else if (url.toLowerCase().contains("/products/")) {
             metrics.setUrlType("PDP");
-        } else if (url.toLowerCase().contains("/search?")) {
+        } else if (url.toLowerCase().contains("/search/")) {
             metrics.setUrlType("Search");
         } else {
             metrics.setUrlType("Other");

@@ -44,7 +44,11 @@ public class ChartController {
         base.setId(performanceMetrics.getId());
         base.setBaseUrl(performanceMetrics.getBaseUrl().split("\\.")[0]);
         base.setRunTime(performanceMetrics.getRunTime());
-        base.setUrlType(performanceMetrics.getUrlType());
+        if("Other".equals(performanceMetrics.getUrlType())) {
+            base.setUrlType("Search");
+        } else {
+            base.setUrlType(performanceMetrics.getUrlType());
+        }
         PerformanceMetricsNormalized fcp = (PerformanceMetricsNormalized) base.clone();
         fcp.setPerfType("FCP");
         fcp.setPerfValue(performanceMetrics.getFirstContentfulPaint());
