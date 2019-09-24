@@ -5,15 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -102,10 +94,29 @@ public class ChartController {
         datapoint_2.add(datapoint2_2);
         datapoint_2.add(datapoint2_3);
 
+        List<String> datapoint3_1 = new ArrayList<>();
+        datapoint3_1.add("2019-09-19T16:45:18.473");
+        datapoint3_1.add("154");
+        datapoint3_1.add(UUID.randomUUID().toString());
+        List<String> datapoint3_2 = new ArrayList<>();
+        datapoint3_2.add("2019-09-19T16:55:18.473");
+        datapoint3_2.add("164");
+        datapoint3_2.add(UUID.randomUUID().toString());
+        List<String> datapoint3_3 = new ArrayList<>();
+        datapoint3_3.add("2019-09-19T17:05:18.473");
+        datapoint3_3.add("174");
+        datapoint3_3.add(UUID.randomUUID().toString());
+        List<List<String>> datapoint_3 = new ArrayList<>();
+        datapoint_3.add(datapoint3_1);
+        datapoint_3.add(datapoint3_2);
+        datapoint_3.add(datapoint3_3);
+
         Map<String, List<List<String>>> group = new HashMap<>();
 
         group.put("le-int-b.landsend.com", datapoint_1);
         group.put("le-int-c.landsend.com", datapoint_2);
+        group.put("le-qas-a.landsend.com", datapoint_3);
+
         Map<String, Map<String, List<List<String>>>> type = new HashMap();
         Map<String, List<List<String>>> group2 = (Map<String, List<List<String>>>) ((HashMap) group).clone();
         Map<String, List<List<String>>> group3 = (Map<String, List<List<String>>>) ((HashMap) group).clone();
@@ -117,7 +128,7 @@ public class ChartController {
         Map<String, Map<String, List<List<String>>>> type3 = (Map<String, Map<String, List<List<String>>>>) ((HashMap) type).clone();
         allMap.put("PDP", type);
         allMap.put("PLP", type2);
-        allMap.put("Other", type3);
+        allMap.put("Search", type3);
         return allMap;
     }
 }

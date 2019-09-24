@@ -63,10 +63,10 @@
                 console.log('Key : ' + typeKey + ', Value : ' + typeData[typeKey]);
                 var chartData = typeData[typeKey];
                 Object.keys(chartData).forEach(function (key) {
-                    console.log('Key : ' + key + ', Value : ' + chartData[key]);
+                    console.log('Key : ' + key);
                     var domain = key;
                     var data = new google.visualization.DataTable();
-                    data.addColumn('date', domain + 'Date');
+                    data.addColumn('date', 'RunTime');
                     data.addColumn('number', domain);
                     var value = chartData[key];
                     value.forEach(function (item, index) {
@@ -82,10 +82,19 @@
                     console.log(data);
                     datas.push(data);
                 });
-                var joinedData = datas[0];
+                var joinedData;
                 datas.forEach(function (value, index) {
                     console.log('joining index ' + index);
-                    joinedData = google.visualization.data.join(joinedData, value, 'full', [ [ 0, 0 ] ], [1], [1]);
+                    var array = new Array(index+1);
+                    for(var i =0; i<index+1;i++) {
+                        array[i] = i + 1
+                    }
+                    console.log(array)
+                    if(index == 0) {
+                        joinedData = google.visualization.data.join(datas[index], value, 'full', [ [ 0, 0 ] ], array, [1]);
+                    } else {
+                        joinedData = google.visualization.data.join(joinedData, value, 'full', [ [ 0, 0 ] ], array, [1]);
+                    }
                 });
                 console.log(allKey+ '_' + typeKey + '_chart')
                 var chart = new google.visualization.LineChart(document.getElementById(allKey+ '_' + typeKey + '_chart'));
@@ -103,9 +112,10 @@
                         }
                     }
                 });
+                console.log(joinedData)
                 chart.draw(joinedData, {
                     tooltip: {trigger: 'selection'},
-                    title: allKey+ ' ' + typeKey + ' chart',
+                    title: allKey + ' ' + typeKey + ' chart',
                     interpolateNulls: true,
                     explorer: {
                         maxZoomOut: 2,
