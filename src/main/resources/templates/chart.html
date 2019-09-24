@@ -14,7 +14,9 @@
     <div>
         <span><label>Please choose number of days you plan to look back for charting: </label></span>
         <span>
-            <input type="number" min="1" max="7" step="1" size="2" th:value="${selectedDays}" id="selectedDays" name="selectedDays"/>
+            <input type="number" min="0" max="7" step="1" th:value="${selectedDays}" id="selectedDays" name="selectedDays"/> days
+            <input type="number" min="1" max="24" step="1" th:value="${selectedHours}" id="selectedHours" name="selectedHours"/> hours.
+            <input type="submit"/>
         </span>
     </div>
 </form>

@@ -7,7 +7,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,17 +23,16 @@ public class ChartController {
     private PerformanceMetricsRepository repository;
 
     @GetMapping("/chart")
-    public String chart(@RequestParam(value = "selectedDays", required = false) Integer selectedDays, Model model) {
-        if(selectedDays == null) {
-            selectedDays = 3;
-        }
+    public String chart(@RequestParam(value = "selectedDays", required = false, defaultValue = "3") Integer selectedDays,
+                        @RequestParam(value = "selectedHours", required = false, defaultValue = "0") Integer selectedHours, Model model) {
         model.addAttribute("selectedDays", selectedDays);
-        model.addAttribute("chartData", getChartData(selectedDays));
+        model.addAttribute("selectedHours", selectedHours);
+        model.addAttribute("chartData", getChartData(selectedDays, selectedHours));
         return "chart";
     }
 
-    public Map<String, Map<String, Map<String, List<List<String>>>>> getChartData(Integer days) {
-        List<PerformanceMetrics> result = repository.findByRunTimeGreaterThan(LocalDateTime.now().minusDays(days));
+    public Map<String, Map<String, Map<String, List<List<String>>>>> getChartData(Integer days, Integer hours) {
+        List<PerformanceMetrics> result = repository.findByRunTimeGreaterThan(LocalDateTime.now(Clock.systemUTC()).minusDays(days).minusHours(hours));
         Map<String, Map<String, Map<String, List<List<String>>>>> output = result.stream()
                 .flatMap(performanceMetrics -> normalizedList(performanceMetrics).stream())
                 .collect(
@@ -48,8 +49,8 @@ public class ChartController {
         PerformanceMetricsNormalized base = new PerformanceMetricsNormalized();
         base.setId(performanceMetrics.getId());
         base.setBaseUrl(performanceMetrics.getBaseUrl().split("\\.")[0]);
-        base.setRunTime(performanceMetrics.getRunTime());
-        if("Other".equals(performanceMetrics.getUrlType())) {
+        base.setRunTime(convertUTCtoLocal(performanceMetrics.getRunTime()));
+        if ("Other".equals(performanceMetrics.getUrlType())) {
             base.setUrlType("Search");
         } else {
             base.setUrlType(performanceMetrics.getUrlType());
@@ -139,5 +140,13 @@ public class ChartController {
         allMap.put("PLP", type2);
         allMap.put("Search", type3);
         return allMap;
+    }
+
+    private LocalDateTime convertUTCtoLocal(LocalDateTime utc) {
+        return utc.plus(TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings(), ChronoField.MILLI_OF_DAY.getBaseUnit());
+    }
+
+    private LocalDateTime convertLocaltoUTC(LocalDateTime local) {
+        return local.minus(TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings(), ChronoField.MILLI_OF_DAY.getBaseUnit());
     }
 }
