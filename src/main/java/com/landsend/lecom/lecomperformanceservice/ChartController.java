@@ -24,25 +24,36 @@ public class ChartController {
 
     @GetMapping("/chart")
     public String chart(@RequestParam(value = "selectedDays", required = false, defaultValue = "3") Integer selectedDays,
-                        @RequestParam(value = "selectedHours", required = false, defaultValue = "0") Integer selectedHours, Model model) {
+                        @RequestParam(value = "selectedHours", required = false, defaultValue = "0") Integer selectedHours,
+                        @RequestParam(value = "domains", required = false) List<String> domains, Model model) {
 
-        model.addAttribute("domains", getDomains());
+        log.info("Domains: " + domains);
+        if(domains == null) {
+            domains = getDomains();
+        }
+        model.addAttribute("allDomains", getDomains());
+        model.addAttribute("domains", domains);
         model.addAttribute("selectedDays", selectedDays);
         model.addAttribute("selectedHours", selectedHours);
-        model.addAttribute("chartData", getChartData(selectedDays, selectedHours));
+        model.addAttribute("chartData", getChartData(selectedDays, selectedHours, domains));
         return "chart";
     }
 
-    public List<Domain> getDomains() {
-        List<Domain> domains = new ArrayList<>();
-        domains.add(new Domain("www", "www", true));
-        domains.add(new Domain("le-dev-b", "le-dev-b", false));
+    public List<String> getDomains() {
+        List<String> domains = new ArrayList<>();
+        domains.add("www");
+        domains.add("origin-m1-www");
+        domains.add("le-qas-a");
+        domains.add("le-dev-b");
+        domains.add("le-int-c");
+        domains.add("le-deva-aws");
         return domains;
     }
 
-    public Map<String, Map<String, Map<String, List<List<String>>>>> getChartData(Integer days, Integer hours) {
+    public Map<String, Map<String, Map<String, List<List<String>>>>> getChartData(Integer days, Integer hours, List<String> domains) {
         List<PerformanceMetrics> result = repository.findByRunTimeGreaterThan(LocalDateTime.now(Clock.systemUTC()).minusDays(days).minusHours(hours));
         Map<String, Map<String, Map<String, List<List<String>>>>> output = result.stream()
+                .filter(performanceMetrics -> domains.contains(performanceMetrics.getBaseUrl().split("\\.")[0]))
                 .flatMap(performanceMetrics -> normalizedList(performanceMetrics).stream())
                 .collect(
                         groupingBy(PerformanceMetricsNormalized::getUrlType,
