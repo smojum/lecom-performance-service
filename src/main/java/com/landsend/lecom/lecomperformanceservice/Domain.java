@@ -8,7 +8,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class Domain {
-    private String name;
     private String value;
     private Boolean checked;
 }

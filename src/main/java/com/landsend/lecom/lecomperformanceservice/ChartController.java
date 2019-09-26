@@ -22,16 +22,17 @@ public class ChartController {
     @Autowired
     private PerformanceMetricsRepository repository;
 
+    private List<String> staticDomains = Arrays.asList("www", "origin-m1-www", "le-qas-a", "le-dev-b", "le-int-c", "le-deva-aws");
+
     @GetMapping("/chart")
     public String chart(@RequestParam(value = "selectedDays", required = false, defaultValue = "3") Integer selectedDays,
                         @RequestParam(value = "selectedHours", required = false, defaultValue = "0") Integer selectedHours,
                         @RequestParam(value = "domains", required = false) List<String> domains, Model model) {
 
-        log.info("Domains: " + domains);
-        if(domains == null) {
-            domains = getDomains();
+        if (domains == null) {
+            domains = staticDomains;
         }
-        model.addAttribute("allDomains", getDomains());
+        model.addAttribute("allDomains", getDomains(domains));
         model.addAttribute("domains", domains);
         model.addAttribute("selectedDays", selectedDays);
         model.addAttribute("selectedHours", selectedHours);
@@ -39,15 +40,11 @@ public class ChartController {
         return "chart";
     }
 
-    public List<String> getDomains() {
-        List<String> domains = new ArrayList<>();
-        domains.add("www");
-        domains.add("origin-m1-www");
-        domains.add("le-qas-a");
-        domains.add("le-dev-b");
-        domains.add("le-int-c");
-        domains.add("le-deva-aws");
-        return domains;
+    public List<Domain> getDomains(List<String> domains) {
+        return staticDomains
+                .stream()
+                .map(staticDomain -> new Domain(staticDomain, domains.stream().anyMatch(domain -> domain.equals(staticDomain))))
+                .collect(Collectors.toList());
     }
 
     public Map<String, Map<String, Map<String, List<List<String>>>>> getChartData(Integer days, Integer hours, List<String> domains) {

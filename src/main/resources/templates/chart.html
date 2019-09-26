@@ -18,8 +18,8 @@
             <input type="number" min="0" max="24" step="1" th:value="${selectedHours}" id="selectedHours" name="selectedHours"/> hours.
         </span>
         <span th:each="domain : ${allDomains}">
-            <input type="checkbox" name="domains" th:value="${domain}" />
-            <label th:text="${domain}"></label>
+            <input type="checkbox" name="domains" th:value="${domain.value}" th:checked="${domain.checked}" />
+            <label th:text="${domain.value}"></label>
         </span>
         <span>
             <input type="submit" value="Refresh"/>
