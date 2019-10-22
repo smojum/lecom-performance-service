@@ -14,7 +14,7 @@ public class CleanupMetrics {
     @Autowired
     private PerformanceMetricsRepository repository;
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 500000)
     public void cleanup() {
         log.info("Cleaning up old data from metrics");
         repository.deleteAll(repository.findByRunTimeLte(LocalDateTime.now(Clock.systemUTC()).minusDays(3).minusHours(0)));
