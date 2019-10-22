@@ -22,7 +22,7 @@ public class ChartController {
     @Autowired
     private PerformanceMetricsRepository repository;
 
-    private List<String> staticDomains = Arrays.asList("www", "origin-m1-www", "origin-m1-www", "le-qas-a", "le-int-c");
+    private List<String> staticDomains = Arrays.asList("www", "origin-m1-www", "origin-d1-www", "le-qas-a", "le-int-c");
 
     @GetMapping("/chart")
     public String chart(@RequestParam(value = "selectedDays", required = false, defaultValue = "3") Integer selectedDays,
