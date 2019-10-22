@@ -2,7 +2,6 @@ package com.landsend.lecom.lecomperformanceservice;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -10,16 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.unbescape.css.CssStringEscapeLevel;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +27,21 @@ import java.util.zip.ZipInputStream;
 public class PerformanceMetricsController {
     @Autowired
     private PerformanceMetricsRepository repository;
+
+    private static byte[] getHtmlFromZip(String base64zip) throws IOException {
+        byte[] zip = Base64.decodeBase64(base64zip.getBytes());
+        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zip));
+        ZipEntry zipEntry = zis.getNextEntry();
+        return IOUtils.toByteArray(zis);
+    }
+
+    public static void main(String[] args) throws IOException {
+        String reportFolder = new File("reports").getAbsolutePath();
+        String input = new String(Files.readAllBytes(Paths.get(reportFolder + "/input.txt")));
+        byte[] output = getHtmlFromZip(input);
+        Path path = Paths.get(Paths.get(reportFolder) + "/testreport.html");
+        Files.write(path, output);
+    }
 
     @PostMapping("metrics")
     public void addData(@RequestBody PerformanceMetrics performanceMetrics) {
@@ -77,20 +87,5 @@ public class PerformanceMetricsController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
-
-    private static byte[] getHtmlFromZip(String base64zip) throws IOException {
-        byte[] zip = Base64.decodeBase64(base64zip.getBytes());
-        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zip));
-        ZipEntry zipEntry = zis.getNextEntry();
-        return IOUtils.toByteArray(zis);
-    }
-
-    public static void main(String args[]) throws IOException {
-        String reportFolder = new File("reports").getAbsolutePath();
-        String input = new String(Files.readAllBytes(Paths.get(reportFolder + "/input.txt")));;
-        byte[] output = getHtmlFromZip(input);
-        Path path = Paths.get(Paths.get(reportFolder) + "/testreport.html");
-        Files.write(path, output);
     }
 }

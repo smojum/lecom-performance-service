@@ -48,7 +48,7 @@ public class ChartController {
     }
 
     public Map<String, Map<String, Map<String, List<List<String>>>>> getChartData(Integer days, Integer hours, List<String> domains) {
-        List<PerformanceMetrics> result = repository.findByRunTimeGreaterThan(LocalDateTime.now(Clock.systemUTC()).minusDays(days).minusHours(hours));
+        List<PerformanceMetrics> result = repository.findByRunTimeGte(LocalDateTime.now(Clock.systemUTC()).minusDays(days).minusHours(hours));
         Map<String, Map<String, Map<String, List<List<String>>>>> output = result.stream()
                 .filter(performanceMetrics -> domains.contains(performanceMetrics.getBaseUrl().split("\\.")[0]))
                 .flatMap(performanceMetrics -> normalizedList(performanceMetrics).stream())
