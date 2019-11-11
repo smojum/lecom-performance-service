@@ -2,16 +2,22 @@ package com.landsend.lecom.lecomperformanceservice;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -24,11 +30,19 @@ public class ChartController {
 
     private List<String> staticDomains = Arrays.asList("www", "origin-m1-www", "origin-d1-www", "le-qas-a", "le-int-c", "le-dev-c");
 
+    @Value("${domains.txt.path:../lighthouse-batch-script/domains.txt}")
+    private String domainTxtPath;
+
     @GetMapping("/chart")
     public String chart(@RequestParam(value = "selectedDays", required = false, defaultValue = "3") Integer selectedDays,
                         @RequestParam(value = "selectedHours", required = false, defaultValue = "0") Integer selectedHours,
                         @RequestParam(value = "domains", required = false) List<String> domains, Model model) {
+        Path path = Paths.get(domainTxtPath);
 
+        boolean pathExists = Files.exists(path);
+        if (pathExists) {
+            staticDomains = createStaticDomainsList(path);
+        }
         if (domains == null) {
             domains = staticDomains;
         }
@@ -38,6 +52,14 @@ public class ChartController {
         model.addAttribute("selectedHours", selectedHours);
         model.addAttribute("chartData", getChartData(selectedDays, selectedHours, domains));
         return "chart";
+    }
+
+    private List<String> createStaticDomainsList(Path path) {
+        try (Stream<String> stream = Files.lines(path)) {
+            return stream.map(s -> s.split("\\.")[0].split("://")[1]).collect(Collectors.toList());
+        } catch (IOException e) {
+            return staticDomains;
+        }
     }
 
     public List<Domain> getDomains(List<String> domains) {
@@ -160,7 +182,7 @@ public class ChartController {
     }
 
     private LocalDateTime convertUTCtoLocal(LocalDateTime utc) {
-        return utc.plus(TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings(), ChronoField.MILLI_OF_DAY.getBaseUnit());
+        return utc.plus(TimeZone.getDefault().getRawOffset(), ChronoField.MILLI_OF_DAY.getBaseUnit());
     }
 
     private LocalDateTime convertLocaltoUTC(LocalDateTime local) {
