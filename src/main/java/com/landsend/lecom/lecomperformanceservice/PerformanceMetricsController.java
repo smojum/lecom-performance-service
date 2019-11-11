@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -27,6 +28,9 @@ import java.util.zip.ZipInputStream;
 public class PerformanceMetricsController {
     @Autowired
     private PerformanceMetricsRepository repository;
+
+    @Autowired
+    private PerformanceMetricsHtmlRepository htmlRepository;
 
     private static byte[] getHtmlFromZip(String base64zip) throws IOException {
         byte[] zip = Base64.decodeBase64(base64zip.getBytes());
@@ -44,13 +48,28 @@ public class PerformanceMetricsController {
     }
 
     @PostMapping("metrics")
-    public void addData(@RequestBody PerformanceMetrics performanceMetrics) {
-        setBaseUrl(performanceMetrics);
-        setUrlType(performanceMetrics);
+    public void addData(@RequestBody PerformanceMetricsAll performanceMetricsAll) {
+        setBaseUrl(performanceMetricsAll);
+        setUrlType(performanceMetricsAll);
+        PerformanceMetrics performanceMetrics = new PerformanceMetrics();
+        String id = UUID.randomUUID().toString();
+        performanceMetrics.setId(id);
+        performanceMetrics.setBaseUrl(performanceMetricsAll.getBaseUrl());
+        performanceMetrics.setUrlType(performanceMetricsAll.getUrlType());
+        performanceMetrics.setUrl(performanceMetricsAll.getUrl());
+        performanceMetrics.setRunTime(performanceMetricsAll.getRunTime());
+        performanceMetrics.setFirstContentfulPaint(performanceMetricsAll.getFirstContentfulPaint());
+        performanceMetrics.setInteractive(performanceMetricsAll.getInteractive());
+        performanceMetrics.setSpeedIndex(performanceMetricsAll.getInteractive());
+
+        PerformanceMetricsHtml performanceMetricsHtml = new PerformanceMetricsHtml();
+        performanceMetricsHtml.setId(id);
+        performanceMetricsHtml.setHtml(performanceMetricsAll.getHtml());
         repository.save(performanceMetrics);
+        htmlRepository.save(performanceMetricsHtml);
     }
 
-    private void setBaseUrl(PerformanceMetrics metrics) {
+    private void setBaseUrl(PerformanceMetricsAll metrics) {
         String urlString = metrics.getUrl();
         try {
             URL url = new URL(urlString);
@@ -60,7 +79,7 @@ public class PerformanceMetricsController {
         }
     }
 
-    private void setUrlType(PerformanceMetrics metrics) {
+    private void setUrlType(PerformanceMetricsAll metrics) {
         String url = metrics.getUrl();
         if (url.toLowerCase().contains("/shop/")) {
             metrics.setUrlType("PLP");
@@ -75,7 +94,7 @@ public class PerformanceMetricsController {
 
     @GetMapping(value = "report/{id}")
     public ResponseEntity<byte[]> getHtmlData(@PathVariable("id") String id) throws IOException {
-        Optional<PerformanceMetrics> repositoryResponse = repository.findById(id);
+        Optional<PerformanceMetricsHtml> repositoryResponse = htmlRepository.findById(id);
         if (repositoryResponse.isPresent()) {
             byte[] contents = getHtmlFromZip(repositoryResponse.get().getHtml());
 
